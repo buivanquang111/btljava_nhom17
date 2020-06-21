@@ -60,10 +60,10 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         tableModelphieuthu = (DefaultTableModel) tbphieuthu.getModel();
         tableModelSP = (DefaultTableModel) jtbSanPham.getModel();
         tableModelHangTon = (DefaultTableModel) jtbHangTon.getModel();
-        
+
         //hiển thị hóa đơn
         hienthihoadon();
-        
+
         //hiển thị phiếu thu và chi
         hienthiphieuchi();
         hienthiphieuthu();
@@ -1685,6 +1685,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         txtmanv.setText(manv);
         txttennv.setText(tennv);
     }
+
     private void XoaTextfield() {
         txtmahd.setText(null);
         txtngaylap.setText(null);
@@ -1755,34 +1756,131 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = con.createStatement();
 
-            String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
-                    + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
-            int ktra = stmt.executeUpdate(sqlsua);
-
-            if (ktra == 0) {
-                System.out.println("update false");
-            } else {
-                System.out.println("update seccusfully");
+            int slsua = Integer.parseInt(txtsoluong.getText());
+            int slco = 0;
+            String sqlcthd = "select* from chitiethd";
+            ResultSet rscthd = stmt.executeQuery(sqlcthd);
+            while (rscthd.next()) {
+                slco = Integer.parseInt(rscthd.getString(4));
             }
 
-            int sohang = tableModelcthd.getRowCount() - 1;
-            for (int i = sohang; i >= 0; i--) {
-                tableModelcthd.removeRow(i);
+            String sqlsp = "select* from sanpham";
+            ResultSet rssp = stmt.executeQuery(sqlsp);
+            int slsp = 0;
+            while (rssp.next()) {
+                if(txtmasp.getText().equals(rssp.getString(1)))
+                slsp = Integer.parseInt(rssp.getString(5));
+                
             }
 
-            String sql = "select* from chitiethd";
-            ResultSet rs = stmt.executeQuery(sql);
-            while (rs.next()) {
-                String[] rows = new String[5];
-                rows[0] = rs.getString(1);
-                rows[1] = rs.getString(2);
-                rows[2] = rs.getString(3);
-                rows[3] = rs.getString(4);
-                rows[4] = rs.getString(5);
-                tableModelcthd.addRow(rows);
-            }
-            JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+            if (slco > slsua) {
+                int slmoi = slsp + (slco - slsua);
+                
+                String sqlsuasp="update sanpham set SoLuong='"+slmoi+"' where MaSP='"+txtmasp.getText()+"'";
+                int ktrasp=stmt.executeUpdate(sqlsuasp);
+                if(ktrasp==0){
+                    System.out.println("update bang sanpham false");
+                }
+                else{
+                    System.out.println("update bang sanpham sucessfully");
+                }
+                
+                String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
+                        + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
+                int ktra = stmt.executeUpdate(sqlsua);
 
+                if (ktra == 0) {
+                    System.out.println("update false");
+                } else {
+                    System.out.println("update seccusfully");
+                }
+
+                int sohang = tableModelcthd.getRowCount() - 1;
+                for (int i = sohang; i >= 0; i--) {
+                    tableModelcthd.removeRow(i);
+                }
+
+                String sql = "select* from chitiethd";
+                ResultSet rs = stmt.executeQuery(sql);
+                while (rs.next()) {
+                    String[] rows = new String[5];
+                    rows[0] = rs.getString(1);
+                    rows[1] = rs.getString(2);
+                    rows[2] = rs.getString(3);
+                    rows[3] = rs.getString(4);
+                    rows[4] = rs.getString(5);
+                    tableModelcthd.addRow(rows);
+                }
+                JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+                return;        
+            }
+            else if(slco<slsua){
+                int slmoisua=slsp-(slsua-slco);
+                String sqlsuasp="update sanpham set SoLuong='"+slmoisua+"' where MaSP='"+txtmasp.getText()+"'";
+                int ktrasp=stmt.executeUpdate(sqlsuasp);
+                if(ktrasp==0){
+                    System.out.println("update bang sanpham false");
+                }
+                else{
+                    System.out.println("update bang sanpham sucessfully");
+                }
+                String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
+                        + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
+                int ktra = stmt.executeUpdate(sqlsua);
+
+                if (ktra == 0) {
+                    System.out.println("update false");
+                } else {
+                    System.out.println("update seccusfully");
+                }
+
+                int sohang = tableModelcthd.getRowCount() - 1;
+                for (int i = sohang; i >= 0; i--) {
+                    tableModelcthd.removeRow(i);
+                }
+
+                String sql = "select* from chitiethd";
+                ResultSet rs = stmt.executeQuery(sql);
+                while (rs.next()) {
+                    String[] rows = new String[5];
+                    rows[0] = rs.getString(1);
+                    rows[1] = rs.getString(2);
+                    rows[2] = rs.getString(3);
+                    rows[3] = rs.getString(4);
+                    rows[4] = rs.getString(5);
+                    tableModelcthd.addRow(rows);
+                }
+                JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+                return;
+            }
+
+//            String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
+//                    + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
+//            int ktra = stmt.executeUpdate(sqlsua);
+//
+//            if (ktra == 0) {
+//                System.out.println("update false");
+//            } else {
+//                System.out.println("update seccusfully");
+//            }
+//
+//            int sohang = tableModelcthd.getRowCount() - 1;
+//            for (int i = sohang; i >= 0; i--) {
+//                tableModelcthd.removeRow(i);
+//            }
+//
+//            String sql = "select* from chitiethd";
+//            ResultSet rs = stmt.executeQuery(sql);
+//            while (rs.next()) {
+//                String[] rows = new String[5];
+//                rows[0] = rs.getString(1);
+//                rows[1] = rs.getString(2);
+//                rows[2] = rs.getString(3);
+//                rows[3] = rs.getString(4);
+//                rows[4] = rs.getString(5);
+//                tableModelcthd.addRow(rows);
+//            }
+//            JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -1793,7 +1891,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
     private void btnhienthiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhienthiActionPerformed
         hienthihoadon();
     }//GEN-LAST:event_btnhienthiActionPerformed
-    private void hienthihoadon(){
+    private void hienthihoadon() {
         Connection con = null;
         Statement stmt = null;
 
@@ -1833,7 +1931,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private void btntimhdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btntimhdActionPerformed
         Connection con = null;
         Statement stmt = null;
@@ -2138,33 +2236,31 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                         }
                     }
                     //update sl bảng sanpham
-                    String sql="select* from sanpham";
-                    ResultSet rs=stmt.executeQuery(sql);
-                    int sl=0;
-                    int slhoantra=Integer.parseInt(txtsoluong.getText());
-                    while(rs.next()){
-                        sl=Integer.parseInt(rs.getString(5));
+                    String sql = "select* from sanpham";
+                    ResultSet rs = stmt.executeQuery(sql);
+                    int sl = 0;
+                    int slhoantra = Integer.parseInt(txtsoluong.getText());
+                    while (rs.next()) {
+                        sl = Integer.parseInt(rs.getString(5));
                     }
-                    int slmoi=sl+slhoantra;
-                    String sqlupdate="update sanpham set SoLuong='"+slmoi+"' where MaSP='" + txtmasp.getText() + "'";
-                    int numberupdate=stmt.executeUpdate(sqlupdate);
-                    if(numberupdate==0){
+                    int slmoi = sl + slhoantra;
+                    String sqlupdate = "update sanpham set SoLuong='" + slmoi + "' where MaSP='" + txtmasp.getText() + "'";
+                    int numberupdate = stmt.executeUpdate(sqlupdate);
+                    if (numberupdate == 0) {
                         System.out.println("hoàn trả thất bại");
-                    }
-                    else{
+                    } else {
                         System.out.println("đã hoàn trả số lượng về bảng sản phẩm");
                     }
-                    
+
                     //delete bảng chitietphieuxuat
-                    String sqlxoapx="delete from chitietphieuxuat where MaSP='"+txtmasp.getText()+"'";
-                    int numberxoapx=stmt.executeUpdate(sqlxoapx);
-                    if(numberxoapx==0){
+                    String sqlxoapx = "delete from chitietphieuxuat where MaSP='" + txtmasp.getText() + "'";
+                    int numberxoapx = stmt.executeUpdate(sqlxoapx);
+                    if (numberxoapx == 0) {
                         System.out.println("delete chitietphieuxuat false");
-                    }
-                    else{
+                    } else {
                         System.out.println("delete chitietphieuxuat succesfully");
                     }
-                    
+
                     //delete bảng chitiethd
                     String sqlxoa = "delete from chitiethd where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
                     int numberxoa = stmt.executeUpdate(sqlxoa);
@@ -3329,8 +3425,6 @@ public class GiaoDienChinh extends javax.swing.JFrame {
 
         txtMaSP_HangTon.setText(maSP);
     }//GEN-LAST:event_jtbHangTonMouseClicked
-
-    
 
     /**
      * @param args the command line arguments
