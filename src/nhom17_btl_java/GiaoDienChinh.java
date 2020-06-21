@@ -2137,6 +2137,35 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                             tableModelcthd.removeRow(i);
                         }
                     }
+                    //update sl bảng sanpham
+                    String sql="select* from sanpham";
+                    ResultSet rs=stmt.executeQuery(sql);
+                    int sl=0;
+                    int slhoantra=Integer.parseInt(txtsoluong.getText());
+                    while(rs.next()){
+                        sl=Integer.parseInt(rs.getString(5));
+                    }
+                    int slmoi=sl+slhoantra;
+                    String sqlupdate="update sanpham set SoLuong='"+slmoi+"' where MaSP='" + txtmasp.getText() + "'";
+                    int numberupdate=stmt.executeUpdate(sqlupdate);
+                    if(numberupdate==0){
+                        System.out.println("hoàn trả thất bại");
+                    }
+                    else{
+                        System.out.println("đã hoàn trả số lượng về bảng sản phẩm");
+                    }
+                    
+                    //delete bảng chitietphieuxuat
+                    String sqlxoapx="delete from chitietphieuxuat where MaSP='"+txtmasp.getText()+"'";
+                    int numberxoapx=stmt.executeUpdate(sqlxoapx);
+                    if(numberxoapx==0){
+                        System.out.println("delete chitietphieuxuat false");
+                    }
+                    else{
+                        System.out.println("delete chitietphieuxuat succesfully");
+                    }
+                    
+                    //delete bảng chitiethd
                     String sqlxoa = "delete from chitiethd where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
                     int numberxoa = stmt.executeUpdate(sqlxoa);
                     if (numberxoa == 0) {
