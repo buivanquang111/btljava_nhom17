@@ -60,8 +60,58 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         tableModelphieuthu = (DefaultTableModel) tbphieuthu.getModel();
         tableModelSP = (DefaultTableModel) jtbSanPham.getModel();
         tableModelHangTon = (DefaultTableModel) jtbHangTon.getModel();
+        
+        //hiển thị hóa đơn
+        hienthihoadon();
+        
+        //hiển thị phiếu thu và chi
+        hienthiphieuchi();
+        hienthiphieuthu();
+
+        //hiển thị khách hàng
         HienThi();
+        //hiển thị doanh thu
         HienThiDT();
+
+        // load danh sach san pham
+        Connection con = null;
+        Statement stmt = null;
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            System.out.println("da ket noi den CSDL");
+            con = DriverManager.getConnection(DB_URL, USER, PASS);
+            System.out.println("tao cau lenh truy van sql...");
+            stmt = con.createStatement();
+            String sql = "select*from sanpham";
+
+            int sohang = tableModelSP.getRowCount() - 1;
+            for (int i = sohang; i >= 0; i--) {
+                tableModelSP.removeRow(i);
+            }
+
+            ResultSet rs = stmt.executeQuery(sql);
+            while (rs.next()) {
+                String[] rows = new String[6];
+                rows[0] = rs.getString(1);
+                rows[1] = rs.getString(2);
+                rows[2] = rs.getString(3);
+                rows[3] = rs.getString(4);
+                rows[4] = rs.getString(5);
+                rows[5] = rs.getString(6);
+                tableModelSP.addRow(rows);
+                tableModelHangTon.addRow(rows);
+            }
+
+            con.close();
+            stmt.close();
+            rs.close();
+
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -310,6 +360,11 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 "Mã sp", "Tên sp", "Loại", "Xuất xứ", "Số lượng", "Đơn giá"
             }
         ));
+        jtbSanPham.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtbSanPhamMouseClicked(evt);
+            }
+        });
         jScrollPane7.setViewportView(jtbSanPham);
 
         btnThemSP.setBackground(new java.awt.Color(204, 204, 204));
@@ -465,6 +520,11 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 "Mã sp", "Tên sp", "Loại ", "Xuất xứ", "Số lượng", "Đơn giá"
             }
         ));
+        jtbHangTon.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jtbHangTonMouseClicked(evt);
+            }
+        });
         jScrollPane8.setViewportView(jtbHangTon);
 
         btnHienThiHangTon.setBackground(new java.awt.Color(204, 204, 204));
@@ -1618,14 +1678,22 @@ public class GiaoDienChinh extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-   
+
     //=============================Quản lý hóa đơn=======================
     public void setTenNv(String tennv, String manv) {
         lbnhanvien.setText(tennv);
         txtmanv.setText(manv);
         txttennv.setText(tennv);
     }
-
+    private void XoaTextfield() {
+        txtmahd.setText(null);
+        txtngaylap.setText(null);
+        txttenkh.setText(null);
+        txttennv.setText(null);
+        txtghichu.setText(null);
+        txtmakh.setText(null);
+        txtmanv.setText(null);
+    }
 
     private void btnTKtheongayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTKtheongayActionPerformed
         Connection con = null;
@@ -1723,6 +1791,9 @@ public class GiaoDienChinh extends javax.swing.JFrame {
     }//GEN-LAST:event_btnsuaspActionPerformed
 
     private void btnhienthiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhienthiActionPerformed
+        hienthihoadon();
+    }//GEN-LAST:event_btnhienthiActionPerformed
+    private void hienthihoadon(){
         Connection con = null;
         Statement stmt = null;
 
@@ -1761,8 +1832,8 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnhienthiActionPerformed
-
+    }
+    
     private void btntimhdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btntimhdActionPerformed
         Connection con = null;
         Statement stmt = null;
@@ -2112,6 +2183,9 @@ public class GiaoDienChinh extends javax.swing.JFrame {
 
     //============================quản lý phiếu thu chi=================================
     private void btnhienthiphieuthuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhienthiphieuthuActionPerformed
+        hienthiphieuthu();
+    }//GEN-LAST:event_btnhienthiphieuthuActionPerformed
+    private void hienthiphieuthu() {
         Connection con = null;
         Statement stmt = null;
 
@@ -2148,9 +2222,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         }
-
-
-    }//GEN-LAST:event_btnhienthiphieuthuActionPerformed
+    }
 
     private void btntimkiemphieuthuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btntimkiemphieuthuActionPerformed
         Connection con = null;
@@ -2169,7 +2241,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 String sqlktra = "select* from chitietphieuxuat";
                 ResultSet rsktra = stmt.executeQuery(sqlktra);
                 while (rsktra.next()) {
-                    if (txtsopxthu.getText().equals(1)) {
+                    if (txtsopxthu.getText().equals(rsktra.getString(1))) {
                         String sqlsopx = "select* from chitietphieuxuat where SoPX='" + txtsopxthu.getText() + "'";
                         ResultSet rssopx = stmt.executeQuery(sqlsopx);
                         while (rssopx.next()) {
@@ -2195,6 +2267,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có mã phiếu xuất này!!!");
+                txtsopxthu.setText(null);
             } else if (rbmaspthu.isSelected()) {
                 int sohang2 = tableModelphieuthu.getRowCount() - 1;
                 for (int i = sohang2; i >= 0; i--) {
@@ -2204,10 +2277,10 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 String sqlktra = "select* from chitietphieuxuat";
                 ResultSet rsktra = stmt.executeQuery(sqlktra);
                 while (rsktra.next()) {
-                    String sqlsopx = "select* from chitietphieuxuat where MaSP='" + txtmaspthu.getText() + "'";
-                    ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                    while (rssopx.next()) {
-                        if (txtmaspthu.getText().equals(2)) {
+                    if (txtmaspthu.getText().equals(rsktra.getString(2))) {
+                        String sqlsopx = "select* from chitietphieuxuat where MaSP='" + txtmaspthu.getText() + "'";
+                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                        while (rssopx.next()) {
                             String[] colums = new String[8];
                             colums[0] = rssopx.getString(1);
                             colums[1] = rssopx.getString(2);
@@ -2226,10 +2299,13 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                             tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
                         }
                         lbtongthu.setText(String.valueOf(tongthu));
+
                         return;
                     }
+
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có mã sản phẩm này!!!");
+                txtmaspthu.setText(null);
 
             } else if (rbngayxuatthu.isSelected()) {
                 int sohang3 = tableModelphieuthu.getRowCount() - 1;
@@ -2270,6 +2346,8 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có phiếu xuất nào trong khoảng ngày này!!!");
+                txttungayxuatthu.setText(null);
+                txtdenngayxuatthu.setText(null);
             }
 
         } catch (ClassNotFoundException ex) {
@@ -2283,6 +2361,9 @@ public class GiaoDienChinh extends javax.swing.JFrame {
     }//GEN-LAST:event_btntimkiemphieuthuActionPerformed
 
     private void btnhienthiphieuchiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnhienthiphieuchiActionPerformed
+        hienthiphieuchi();
+    }//GEN-LAST:event_btnhienthiphieuchiActionPerformed
+    private void hienthiphieuchi() {
         Connection con = null;
         Statement stmt = null;
 
@@ -2319,7 +2400,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }//GEN-LAST:event_btnhienthiphieuchiActionPerformed
+    }
 
     private void btntimkiemphieuchiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btntimkiemphieuchiActionPerformed
         Connection con = null;
@@ -2338,7 +2419,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 String sqlktra = "select* from chitietphieunhap";
                 ResultSet rsktra = stmt.executeQuery(sqlktra);
                 while (rsktra.next()) {
-                    if (txtsopnchi.getText().equals(1)) {
+                    if (txtsopnchi.getText().equals(rsktra.getString(1))) {
                         String sqlsopx = "select* from chitietphieunhap where SoPN='" + txtsopnchi.getText() + "'";
                         ResultSet rssopx = stmt.executeQuery(sqlsopx);
                         while (rssopx.next()) {
@@ -2364,6 +2445,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập này!!!");
+                txtsopnchi.setText(null);
             } else if (rbmaspchi.isSelected()) {
                 int sohang2 = tableModelphieuchi.getRowCount() - 1;
                 for (int i = sohang2; i >= 0; i--) {
@@ -2372,7 +2454,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 String sqlktra = "select* from chitietphieunhap";
                 ResultSet rsktra = stmt.executeQuery(sqlktra);
                 while (rsktra.next()) {
-                    if (txtmaspchi.getText().equals(1)) {
+                    if (txtmaspchi.getText().equals(rsktra.getString(2))) {
                         String sqlsopx = "select* from chitietphieunhap where MaSP='" + txtmaspchi.getText() + "'";
                         ResultSet rssopx = stmt.executeQuery(sqlsopx);
                         while (rssopx.next()) {
@@ -2398,6 +2480,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có sản phẩm này!!!");
+                txtmaspchi.setText(null);
             } else if (rbngaynhapchi.isSelected()) {
                 int sohang3 = tableModelphieuchi.getRowCount() - 1;
                 for (int i = sohang3; i >= 0; i--) {
@@ -2437,6 +2520,8 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     }
                 }
                 JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập nào trong khoảng ngày này!!!");
+                txttungaynhapchi.setText(null);
+                txtdenngaynhapchi.setText(null);
             }
 
         } catch (ClassNotFoundException ex) {
@@ -2454,7 +2539,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
     }//GEN-LAST:event_btnhienthiNActionPerformed
 
     private void btnthemNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnthemNActionPerformed
-         String MaKH = null, TenKH = null, NgaySinh = null, SDT = null, DiaChi = null;
+        String MaKH = null, TenKH = null, NgaySinh = null, SDT = null, DiaChi = null;
         String GhiChu = txtghichuN.getText();
         int GioiTinh = 0;
         boolean isOK = true;
@@ -2511,7 +2596,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
     }//GEN-LAST:event_btnthemNActionPerformed
 
     private void btnsuaNActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnsuaNActionPerformed
-         String MaKH = null, TenKH = null, NgaySinh = null, SDT = null, DiaChi = null;
+        String MaKH = null, TenKH = null, NgaySinh = null, SDT = null, DiaChi = null;
         String GhiChu = txtghichuN.getText();
         int GioiTinh = 0;
         boolean isOK = true;
@@ -2648,7 +2733,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_tbkhachhangMouseClicked
 
-     public void xoatextbox() {
+    public void xoatextbox() {
         txtmakhN.setText("");
         txthotenN.setText("");
         txtngaysinhN.setText("");
@@ -2657,7 +2742,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         radionamN.setSelected(true);
         txtghichuN.setText("");
     }
-    
+
     private ArrayList<khachhang> danhsach = new ArrayList<>();
     private DefaultTableModel model;
 
@@ -2673,16 +2758,17 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             });
         }
     }
-    
+
     private ArrayList<doanhthu> danhsach1 = new ArrayList<>();
     private DefaultTableModel model1;
-    public void HienThiDT(){
+
+    public void HienThiDT() {
         model = (DefaultTableModel) tbdoanhthu.getModel();
         int stt = 0;
-        
+
         danhsach1 = new Connect().laydanhsach1();
         model.setRowCount(0);
-        for(doanhthu dt : danhsach1){
+        for (doanhthu dt : danhsach1) {
             model.addRow(new Object[]{
                 stt++, dt.getMaSP(), dt.getTenSP(), dt.getSoLuong(), dt.getDonGia(), dt.getTenKH(), dt.getGhiChu(), dt.getMaHD()
             });
@@ -2691,8 +2777,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         lbtongsokhachN.setText(Integer.toString(new Connect().tongKhach()));
         lbdoanhthuN.setText(Integer.toString(new Connect().tongDoanhThu()));
     }
-    
-    
+
     //=======================QUẢN LÝ SẢN PHẨM=======================
     private void XoaTextfieldSP() {
         txtMaSP.setText(null);
@@ -3021,7 +3106,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         }
-                   
+
     }//GEN-LAST:event_btnNhapSPActionPerformed
 
     private void btnBanSPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBanSPActionPerformed
@@ -3059,8 +3144,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
 
                 if (soLuongTruoc - soLuong < 0) {
                     JOptionPane.showMessageDialog(rootPane, "Số lượng bán không đủ!");
-                } 
-                else {
+                } else {
                     int soLuongMoi = soLuongTruoc - soLuong;
                     String sqlSuaSP = "update sanpham set SoLuong='" + soLuongMoi + "' where MaSP='" + maSP + "'";
                     stmt.executeUpdate(sqlSuaSP);
@@ -3088,8 +3172,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     rs.close();
                 }
                 JOptionPane.showMessageDialog(rootPane, "Ban hang thanh cong!");
-            } 
-            else {
+            } else {
                 JOptionPane.showMessageDialog(rootPane, "Sản phẩm không tồn tại!");
             }
             XoaTextfieldSP();
@@ -3105,6 +3188,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnBanSPActionPerformed
 
+    //==================Quản Lý Hàng Tồn=================
     private void btnHienThiHangTonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHienThiHangTonActionPerformed
         // TODO add your handling code here:
         Connection con = null;
@@ -3191,17 +3275,34 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_btnKiemTraActionPerformed
 
-    private void XoaTextfield() {
-        txtmahd.setText(null);
-        txtngaylap.setText(null);
-        txttenkh.setText(null);
-        txttennv.setText(null);
-        txtghichu.setText(null);
-        txtmakh.setText(null);
-        txtmanv.setText(null);
-    }
+    private void jtbSanPhamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtbSanPhamMouseClicked
+        // TODO add your handling code here:
+        int row = jtbSanPham.getSelectedRow();
+        String maSP = (String) jtbSanPham.getValueAt(row, 0);
+        String tenSP = (String) jtbSanPham.getValueAt(row, 1);
+        String Loai = (String) jtbSanPham.getValueAt(row, 2);
+        String xuatXu = (String) jtbSanPham.getValueAt(row, 3);
+        String soLuong = (String) jtbSanPham.getValueAt(row, 4);
+        String donGia = (String) jtbSanPham.getValueAt(row, 5);
 
-   
+        txtMaSP.setText(maSP);
+        txtTenSP.setText(tenSP);
+        txtLoai.setText(Loai);
+        txtXuatXu.setText(xuatXu);
+        txtSL.setText(soLuong);
+        txtDonGia.setText(donGia);
+    }//GEN-LAST:event_jtbSanPhamMouseClicked
+
+    private void jtbHangTonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jtbHangTonMouseClicked
+        // TODO add your handling code here:
+        int row = jtbHangTon.getSelectedRow();
+        String maSP = (String) jtbHangTon.getValueAt(row, 0);
+
+        txtMaSP_HangTon.setText(maSP);
+    }//GEN-LAST:event_jtbHangTonMouseClicked
+
+    
+
     /**
      * @param args the command line arguments
      */
