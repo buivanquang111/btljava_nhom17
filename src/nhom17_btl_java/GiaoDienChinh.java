@@ -8,7 +8,6 @@ package nhom17_btl_java;
 import Object.Connect;
 import Object.doanhthu;
 import Object.khachhang;
-import java.sql.Connection;
 
 import java.sql.Connection;
 
@@ -17,17 +16,22 @@ import java.sql.ResultSet;
 
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
-import static nhom17_btl_java.Login.JDBC_DRIVER;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.util.JRStyledText.Run;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -644,10 +648,10 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         jPanel8.setLayout(jPanel8Layout);
         jPanel8Layout.setHorizontalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel8Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 514, Short.MAX_VALUE)
-                .addContainerGap())
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
+                .addContainerGap(104, Short.MAX_VALUE)
+                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(123, 123, 123))
             .addGroup(jPanel8Layout.createSequentialGroup()
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel8Layout.createSequentialGroup()
@@ -678,12 +682,9 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                                 .addComponent(txtsoluong)
                                 .addComponent(txtmahdct)
                                 .addComponent(txtmasp)
-                                .addComponent(txttensp)))))
+                                .addComponent(txttensp))))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 516, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel8Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(123, 123, 123))
         );
         jPanel8Layout.setVerticalGroup(
             jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -717,9 +718,9 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     .addComponent(btnsuasp, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(83, 83, 83)
                 .addComponent(jLabel19)
-                .addGap(55, 55, 55)
+                .addGap(59, 59, 59)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(32, 32, 32)
+                .addGap(28, 28, 28)
                 .addGroup(jPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel20, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lbtongtien, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -771,6 +772,11 @@ public class GiaoDienChinh extends javax.swing.JFrame {
         btninhd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/print-icon.png"))); // NOI18N
         btninhd.setText("In HD");
         btninhd.setOpaque(false);
+        btninhd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btninhdActionPerformed(evt);
+            }
+        });
 
         btnsuahd.setBackground(new java.awt.Color(204, 204, 204));
         btnsuahd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/image/sua.png"))); // NOI18N
@@ -1710,34 +1716,40 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 tableModelhd.removeRow(i);
             }
 
-            Date datetungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungay.getText());
+            if (txttungay.getText().equals("") || txtdenngay.getText().equals("")) {
+                JOptionPane.showMessageDialog(rootPane, "Bạn cần điền đủ ngày vào 2 ô để tìm kiếm!!!");
+                return;
+            } else {
+                Date datetungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungay.getText());
 
-            Date datedenngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngay.getText());
+                Date datedenngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngay.getText());
 
-            String sqlktra = "select* from hoadon";
-            ResultSet rsktra = stmt.executeQuery(sqlktra);
-            while (rsktra.next()) {
-                Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(2));
+                String sqlktra = "select* from hoadon";
+                ResultSet rsktra = stmt.executeQuery(sqlktra);
+                while (rsktra.next()) {
+                    Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(2));
 
-                if (date1.compareTo(datetungay) >= 0 && date1.compareTo(datedenngay) <= 0) {
-                    String sqltk = "select* from hoadon where NgayLap between '" + txttungay.getText() + "'and'" + txtdenngay.getText() + "'";
-                    ResultSet rs = stmt.executeQuery(sqltk);
-                    while (rs.next()) {
-                        String[] colums = new String[7];
-                        colums[0] = rs.getString(1);
-                        colums[1] = rs.getString(2);
-                        colums[2] = rs.getString(3);
-                        colums[3] = rs.getString(4);
-                        colums[4] = rs.getString(5);
-                        colums[5] = rs.getString(6);
-                        colums[6] = rs.getString(7);
-                        tableModelhd.addRow(colums);
+                    if (date1.compareTo(datetungay) >= 0 && date1.compareTo(datedenngay) <= 0) {
+                        String sqltk = "select* from hoadon where NgayLap between '" + txttungay.getText() + "'and'" + txtdenngay.getText() + "'";
+                        ResultSet rs = stmt.executeQuery(sqltk);
+                        while (rs.next()) {
+                            String[] colums = new String[7];
+                            colums[0] = rs.getString(1);
+                            colums[1] = rs.getString(2);
+                            colums[2] = rs.getString(3);
+                            colums[3] = rs.getString(4);
+                            colums[4] = rs.getString(5);
+                            colums[5] = rs.getString(6);
+                            colums[6] = rs.getString(7);
+                            tableModelhd.addRow(colums);
+                        }
+                        return;
                     }
-                    return;
                 }
+                JOptionPane.showMessageDialog(rootPane, "không có hóa đơn nào trong khoảng ngày này!!!");
+                txttungay.setText(null);
+                txtdenngay.setText(null);
             }
-            JOptionPane.showMessageDialog(rootPane, "không có hóa đơn nào trong khoảng ngày này!!!");
-
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -1756,131 +1768,107 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = con.createStatement();
 
-            int slsua = Integer.parseInt(txtsoluong.getText());
-            int slco = 0;
-            String sqlcthd = "select* from chitiethd";
-            ResultSet rscthd = stmt.executeQuery(sqlcthd);
-            while (rscthd.next()) {
-                slco = Integer.parseInt(rscthd.getString(4));
-            }
-
-            String sqlsp = "select* from sanpham";
-            ResultSet rssp = stmt.executeQuery(sqlsp);
-            int slsp = 0;
-            while (rssp.next()) {
-                if(txtmasp.getText().equals(rssp.getString(1)))
-                slsp = Integer.parseInt(rssp.getString(5));
-                
-            }
-
-            if (slco > slsua) {
-                int slmoi = slsp + (slco - slsua);
-                
-                String sqlsuasp="update sanpham set SoLuong='"+slmoi+"' where MaSP='"+txtmasp.getText()+"'";
-                int ktrasp=stmt.executeUpdate(sqlsuasp);
-                if(ktrasp==0){
-                    System.out.println("update bang sanpham false");
-                }
-                else{
-                    System.out.println("update bang sanpham sucessfully");
-                }
-                
-                String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
-                        + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
-                int ktra = stmt.executeUpdate(sqlsua);
-
-                if (ktra == 0) {
-                    System.out.println("update false");
-                } else {
-                    System.out.println("update seccusfully");
-                }
-
-                int sohang = tableModelcthd.getRowCount() - 1;
-                for (int i = sohang; i >= 0; i--) {
-                    tableModelcthd.removeRow(i);
-                }
-
-                String sql = "select* from chitiethd";
-                ResultSet rs = stmt.executeQuery(sql);
-                while (rs.next()) {
-                    String[] rows = new String[5];
-                    rows[0] = rs.getString(1);
-                    rows[1] = rs.getString(2);
-                    rows[2] = rs.getString(3);
-                    rows[3] = rs.getString(4);
-                    rows[4] = rs.getString(5);
-                    tableModelcthd.addRow(rows);
-                }
-                JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
-                return;        
-            }
-            else if(slco<slsua){
-                int slmoisua=slsp-(slsua-slco);
-                String sqlsuasp="update sanpham set SoLuong='"+slmoisua+"' where MaSP='"+txtmasp.getText()+"'";
-                int ktrasp=stmt.executeUpdate(sqlsuasp);
-                if(ktrasp==0){
-                    System.out.println("update bang sanpham false");
-                }
-                else{
-                    System.out.println("update bang sanpham sucessfully");
-                }
-                String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
-                        + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
-                int ktra = stmt.executeUpdate(sqlsua);
-
-                if (ktra == 0) {
-                    System.out.println("update false");
-                } else {
-                    System.out.println("update seccusfully");
-                }
-
-                int sohang = tableModelcthd.getRowCount() - 1;
-                for (int i = sohang; i >= 0; i--) {
-                    tableModelcthd.removeRow(i);
-                }
-
-                String sql = "select* from chitiethd";
-                ResultSet rs = stmt.executeQuery(sql);
-                while (rs.next()) {
-                    String[] rows = new String[5];
-                    rows[0] = rs.getString(1);
-                    rows[1] = rs.getString(2);
-                    rows[2] = rs.getString(3);
-                    rows[3] = rs.getString(4);
-                    rows[4] = rs.getString(5);
-                    tableModelcthd.addRow(rows);
-                }
-                JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+            if (txtmahdct.getText().equals("") || txtmasp.getText().equals("") || txttensp.getText().equals("") || txtsoluong.getText().equals("") || txtdongia.getText().equals("")) {
+                JOptionPane.showMessageDialog(rootPane, "Bạn cần nhập đầy đủ các ô để sửa!!!");
                 return;
+            } else {
+                int slsua = Integer.parseInt(txtsoluong.getText());
+                int slco = 0;
+                String sqlcthd = "select* from chitiethd";
+                ResultSet rscthd = stmt.executeQuery(sqlcthd);
+                while (rscthd.next()) {
+                    slco = Integer.parseInt(rscthd.getString(4));
+                }
+
+                String sqlsp = "select* from sanpham";
+                ResultSet rssp = stmt.executeQuery(sqlsp);
+                int slsp = 0;
+                while (rssp.next()) {
+                    if (txtmasp.getText().equals(rssp.getString(1))) {
+                        slsp = Integer.parseInt(rssp.getString(5));
+                    }
+
+                }
+
+                if (slco > slsua) {
+                    int slmoi = slsp + (slco - slsua);
+
+                    String sqlsuasp = "update sanpham set SoLuong='" + slmoi + "' where MaSP='" + txtmasp.getText() + "'";
+                    int ktrasp = stmt.executeUpdate(sqlsuasp);
+                    if (ktrasp == 0) {
+                        System.out.println("update bang sanpham false");
+                    } else {
+                        System.out.println("update bang sanpham sucessfully");
+                    }
+
+                    String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
+                            + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
+                    int ktra = stmt.executeUpdate(sqlsua);
+
+                    if (ktra == 0) {
+                        System.out.println("update false");
+                    } else {
+                        System.out.println("update seccusfully");
+                    }
+
+                    int sohang = tableModelcthd.getRowCount() - 1;
+                    for (int i = sohang; i >= 0; i--) {
+                        tableModelcthd.removeRow(i);
+                    }
+
+                    String sql = "select* from chitiethd";
+                    ResultSet rs = stmt.executeQuery(sql);
+                    while (rs.next()) {
+                        String[] rows = new String[5];
+                        rows[0] = rs.getString(1);
+                        rows[1] = rs.getString(2);
+                        rows[2] = rs.getString(3);
+                        rows[3] = rs.getString(4);
+                        rows[4] = rs.getString(5);
+                        tableModelcthd.addRow(rows);
+                    }
+                    JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+                    return;
+                } else if (slco < slsua) {
+                    int slmoisua = slsp - (slsua - slco);
+                    String sqlsuasp = "update sanpham set SoLuong='" + slmoisua + "' where MaSP='" + txtmasp.getText() + "'";
+                    int ktrasp = stmt.executeUpdate(sqlsuasp);
+                    if (ktrasp == 0) {
+                        System.out.println("update bang sanpham false");
+                    } else {
+                        System.out.println("update bang sanpham sucessfully");
+                    }
+                    String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
+                            + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
+                    int ktra = stmt.executeUpdate(sqlsua);
+
+                    if (ktra == 0) {
+                        System.out.println("update false");
+                    } else {
+                        System.out.println("update seccusfully");
+                    }
+
+                    int sohang = tableModelcthd.getRowCount() - 1;
+                    for (int i = sohang; i >= 0; i--) {
+                        tableModelcthd.removeRow(i);
+                    }
+
+                    String sql = "select* from chitiethd";
+                    ResultSet rs = stmt.executeQuery(sql);
+                    while (rs.next()) {
+                        String[] rows = new String[5];
+                        rows[0] = rs.getString(1);
+                        rows[1] = rs.getString(2);
+                        rows[2] = rs.getString(3);
+                        rows[3] = rs.getString(4);
+                        rows[4] = rs.getString(5);
+                        tableModelcthd.addRow(rows);
+                    }
+                    JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
+                    return;
+                }
             }
 
-//            String sqlsua = "update chitiethd set MaHD='" + txtmahdct.getText() + "',MaSP='" + txtmasp.getText() + "',TenSP='" + txttensp.getText() + "',SoLuong='"
-//                    + Integer.parseInt(txtsoluong.getText()) + "',DonGia='" + Integer.parseInt(txtdongia.getText()) + "'where MaHD='" + txtmahdct.getText() + "'and MaSP='" + txtmasp.getText() + "'";
-//            int ktra = stmt.executeUpdate(sqlsua);
-//
-//            if (ktra == 0) {
-//                System.out.println("update false");
-//            } else {
-//                System.out.println("update seccusfully");
-//            }
-//
-//            int sohang = tableModelcthd.getRowCount() - 1;
-//            for (int i = sohang; i >= 0; i--) {
-//                tableModelcthd.removeRow(i);
-//            }
-//
-//            String sql = "select* from chitiethd";
-//            ResultSet rs = stmt.executeQuery(sql);
-//            while (rs.next()) {
-//                String[] rows = new String[5];
-//                rows[0] = rs.getString(1);
-//                rows[1] = rs.getString(2);
-//                rows[2] = rs.getString(3);
-//                rows[3] = rs.getString(4);
-//                rows[4] = rs.getString(5);
-//                tableModelcthd.addRow(rows);
-//            }
-//            JOptionPane.showMessageDialog(rootPane, "sửa thành công!!!");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
         } catch (SQLException ex) {
@@ -1950,7 +1938,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 }
             }
             if (dem == 0) {
-                JOptionPane.showMessageDialog(rootPane, "hóa dơn này không có!!!");
+                JOptionPane.showMessageDialog(rootPane, "hóa dơn này không có!\n Bạn cần nhập mã đúng hóa đơn để tìm kiếm!!!");
                 return;
             }
 
@@ -1999,7 +1987,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                 }
             }
             if (dem == 0) {
-                JOptionPane.showMessageDialog(rootPane, "hoa don nay khong co!");
+                JOptionPane.showMessageDialog(rootPane, "Hóa đươn này không có\n Bạn cần nhập đúng mã hóa đơn để xóa!!!!");
                 return;
             }
 
@@ -2069,7 +2057,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     return;
                 }
             }
-            JOptionPane.showMessageDialog(rootPane, "không có hóa đơn này để sửa!!!");
+            JOptionPane.showMessageDialog(rootPane, "không có hóa đơn này!\n Bạn cần nhập đúng mã hóa đơn để sửa!!!");
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
@@ -2097,56 +2085,62 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             System.out.println("tao cau lenh truy van sql...");
             stmt = con.createStatement();
 
-            //ktra nhap tennv
-            String sqltennv = "select* from nhanvien";
-            ResultSet rstennv = stmt.executeQuery(sqltennv);
-            while (rstennv.next()) {
-                if (txttennv.getText().equals(rstennv.getString(2))) {
-                    //thuc hien them hoa don
-                    String ma = "select MaHD from hoadon where MaHD='" + txtmahd.getText() + "'";
-                    ResultSet rs1 = stmt.executeQuery(ma);
-                    while (rs1.next()) {
-                        JOptionPane.showMessageDialog(rootPane, "MaHD nay da ton tai!!");
+            if (ngay.equals("") || mahd.equals("") || tennv.equals("") || tenkh.equals("") || ghichu.equals("") || makh.equals("") || manv.equals("")) {
+                JOptionPane.showMessageDialog(rootPane, "Thêm mới thất bại! \n Bạn cần điền đầy đủ thông tin vào các ô!!!");
+                return;
+            } else {
+                //ktra nhap tennv
+                String sqltennv = "select* from nhanvien";
+                ResultSet rstennv = stmt.executeQuery(sqltennv);
+                while (rstennv.next()) {
+                    if (txttennv.getText().equals(rstennv.getString(2))) {
+                        //thuc hien them hoa don
+                        String ma = "select MaHD from hoadon where MaHD='" + txtmahd.getText() + "'";
+                        ResultSet rs1 = stmt.executeQuery(ma);
+                        while (rs1.next()) {
+                            JOptionPane.showMessageDialog(rootPane, "MaHD nay da ton tai!!");
+                            return;
+                        }
+
+                        String sqlthem = "insert into hoadon value('" + mahd + "','" + ngay + "','" + tennv + "','" + tenkh + "','" + ghichu + "','" + makh + "','" + manv + "');";
+                        int numberrows = stmt.executeUpdate(sqlthem);
+
+                        if (numberrows == 0) {
+                            System.out.println("insertion falsed");
+                        } else {
+                            System.out.println("insertion succesfully");
+                        }
+                        int sohang = tableModelhd.getRowCount() - 1;
+                        for (int i = sohang; i >= 0; i--) {
+                            tableModelhd.removeRow(i);
+                        }
+
+                        String sql = "select*from hoadon";
+                        ResultSet rs = stmt.executeQuery(sql);
+                        while (rs.next()) {
+                            String[] rows = new String[7];
+                            rows[0] = rs.getString(1);
+                            rows[1] = rs.getString(2);
+                            rows[2] = rs.getString(3);
+                            rows[3] = rs.getString(4);
+                            rows[4] = rs.getString(5);
+                            rows[5] = rs.getString(6);
+                            rows[6] = rs.getString(7);
+                            tableModelhd.addRow(rows);
+                        }
+                        JOptionPane.showMessageDialog(rootPane, "Thêm thành công!!!");
+                        rs.close();
+                        XoaTextfield();
                         return;
                     }
 
-                    String sqlthem = "insert into hoadon value('" + mahd + "','" + ngay + "','" + tennv + "','" + tenkh + "','" + ghichu + "','" + makh + "','" + manv + "');";
-                    int numberrows = stmt.executeUpdate(sqlthem);
-
-                    if (numberrows == 0) {
-                        System.out.println("insertion falsed");
-                    } else {
-                        System.out.println("insertion succesfully");
-                    }
-                    int sohang = tableModelhd.getRowCount() - 1;
-                    for (int i = sohang; i >= 0; i--) {
-                        tableModelhd.removeRow(i);
-                    }
-
-                    String sql = "select*from hoadon";
-                    ResultSet rs = stmt.executeQuery(sql);
-                    while (rs.next()) {
-                        String[] rows = new String[7];
-                        rows[0] = rs.getString(1);
-                        rows[1] = rs.getString(2);
-                        rows[2] = rs.getString(3);
-                        rows[3] = rs.getString(4);
-                        rows[4] = rs.getString(5);
-                        rows[5] = rs.getString(6);
-                        rows[6] = rs.getString(7);
-                        tableModelhd.addRow(rows);
-                    }
-                    JOptionPane.showMessageDialog(rootPane, "Thêm thành công!!!");
-                    rs.close();
-                    XoaTextfield();
-                    return;
                 }
-            }
-            JOptionPane.showMessageDialog(rootPane, "không tồn tại tên nhân viên này");
+                JOptionPane.showMessageDialog(rootPane, "không tồn tại tên nhân viên này");
 
-            XoaTextfield();
-            con.close();
-            stmt.close();
+                XoaTextfield();
+                con.close();
+                stmt.close();
+            }
 
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(GiaoDienChinh.class.getName()).log(Level.SEVERE, null, ex);
@@ -2190,7 +2184,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             ResultSet rs = stmt.executeQuery(sqlcthd);
 
             while (rs.next()) {
-                String[] rows = new String[7];
+                String[] rows = new String[5];
                 rows[0] = rs.getString(1);
                 rows[1] = rs.getString(2);
                 rows[2] = rs.getString(3);
@@ -2363,116 +2357,132 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     tableModelphieuthu.removeRow(i);
                 }
 
-                String sqlktra = "select* from chitietphieuxuat";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    if (txtsopxthu.getText().equals(rsktra.getString(1))) {
-                        String sqlsopx = "select* from chitietphieuxuat where SoPX='" + txtsopxthu.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuthu.addRow(colums);
+                if (txtsopxthu.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "Không được để trống ô số phiếu xuất!!!");
+                    return;
+                } else {
+                    String sqlktra = "select* from chitietphieuxuat";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        if (txtsopxthu.getText().equals(rsktra.getString(1))) {
+                            String sqlsopx = "select* from chitietphieuxuat where SoPX='" + txtsopxthu.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuthu.addRow(colums);
+                            }
+                            txtsopxthu.setText(null);
+                            int tongthu = 0;
+                            int b = tableModelphieuthu.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
+                            }
+                            lbtongthu.setText(String.valueOf(tongthu));
+                            return;
                         }
-                        txtsopxthu.setText(null);
-                        int tongthu = 0;
-                        int b = tableModelphieuthu.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
-                        }
-                        lbtongthu.setText(String.valueOf(tongthu));
-                        return;
                     }
+                    JOptionPane.showMessageDialog(rootPane, "không có mã phiếu xuất này!!!");
+                    txtsopxthu.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có mã phiếu xuất này!!!");
-                txtsopxthu.setText(null);
             } else if (rbmaspthu.isSelected()) {
                 int sohang2 = tableModelphieuthu.getRowCount() - 1;
                 for (int i = sohang2; i >= 0; i--) {
                     tableModelphieuthu.removeRow(i);
                 }
 
-                String sqlktra = "select* from chitietphieuxuat";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    if (txtmaspthu.getText().equals(rsktra.getString(2))) {
-                        String sqlsopx = "select* from chitietphieuxuat where MaSP='" + txtmaspthu.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuthu.addRow(colums);
-                        }
-                        txtmaspthu.setText(null);
-                        int tongthu = 0;
-                        int b = tableModelphieuthu.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
-                        }
-                        lbtongthu.setText(String.valueOf(tongthu));
+                if (txtmaspthu.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "không được để trống ô mã sản phẩm của phiếu thu!!!");
+                    return;
+                } else {
+                    String sqlktra = "select* from chitietphieuxuat";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        if (txtmaspthu.getText().equals(rsktra.getString(2))) {
+                            String sqlsopx = "select* from chitietphieuxuat where MaSP='" + txtmaspthu.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuthu.addRow(colums);
+                            }
+                            txtmaspthu.setText(null);
+                            int tongthu = 0;
+                            int b = tableModelphieuthu.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
+                            }
+                            lbtongthu.setText(String.valueOf(tongthu));
 
-                        return;
+                            return;
+                        }
+
                     }
-
+                    JOptionPane.showMessageDialog(rootPane, "không có mã sản phẩm này!!!");
+                    txtmaspthu.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có mã sản phẩm này!!!");
-                txtmaspthu.setText(null);
 
             } else if (rbngayxuatthu.isSelected()) {
                 int sohang3 = tableModelphieuthu.getRowCount() - 1;
                 for (int i = sohang3; i >= 0; i--) {
                     tableModelphieuthu.removeRow(i);
                 }
-                Date tungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungayxuatthu.getText());
-                Date denngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngayxuatthu.getText());
 
-                String sqlktra = "select* from chitietphieuxuat";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(8));
-                    if (date1.compareTo(tungay) >= 0 && date1.compareTo(denngay) <= 0) {
-                        String sqlsopx = "select* from chitietphieuxuat where NgayXuat between'" + txttungayxuatthu.getText() + "'and'" + txtdenngayxuatthu.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuthu.addRow(colums);
+                if (txttungayxuatthu.getText().equals("") || txtdenngayxuatthu.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "Không đưuọc để trống ô từ ngày và đến ngày trong bảng phiếu thu!!!");
+                    return;
+                } else {
+                    Date tungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungayxuatthu.getText());
+                    Date denngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngayxuatthu.getText());
+
+                    String sqlktra = "select* from chitietphieuxuat";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(8));
+                        if (date1.compareTo(tungay) >= 0 && date1.compareTo(denngay) <= 0) {
+                            String sqlsopx = "select* from chitietphieuxuat where NgayXuat between'" + txttungayxuatthu.getText() + "'and'" + txtdenngayxuatthu.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuthu.addRow(colums);
+                            }
+                            txttungayxuatthu.setText(null);
+                            txtdenngayxuatthu.setText(null);
+                            int tongthu = 0;
+                            int b = tableModelphieuthu.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
+                            }
+                            lbtongthu.setText(String.valueOf(tongthu));
+                            return;
                         }
-                        txttungayxuatthu.setText(null);
-                        txtdenngayxuatthu.setText(null);
-                        int tongthu = 0;
-                        int b = tableModelphieuthu.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongthu = tongthu + Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuthu.getValueAt(i, 6)));
-                        }
-                        lbtongthu.setText(String.valueOf(tongthu));
-                        return;
                     }
+                    JOptionPane.showMessageDialog(rootPane, "không có phiếu xuất nào trong khoảng ngày này!!!");
+                    txttungayxuatthu.setText(null);
+                    txtdenngayxuatthu.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có phiếu xuất nào trong khoảng ngày này!!!");
-                txttungayxuatthu.setText(null);
-                txtdenngayxuatthu.setText(null);
             }
 
         } catch (ClassNotFoundException ex) {
@@ -2541,112 +2551,127 @@ public class GiaoDienChinh extends javax.swing.JFrame {
                     tableModelphieuchi.removeRow(i);
                 }
 
-                String sqlktra = "select* from chitietphieunhap";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    if (txtsopnchi.getText().equals(rsktra.getString(1))) {
-                        String sqlsopx = "select* from chitietphieunhap where SoPN='" + txtsopnchi.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuchi.addRow(colums);
+                if (txtsopnchi.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "Không được để trống ô số phiếu nhập!!!");
+                    return;
+                } else {
+                    String sqlktra = "select* from chitietphieunhap";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        if (txtsopnchi.getText().equals(rsktra.getString(1))) {
+                            String sqlsopx = "select* from chitietphieunhap where SoPN='" + txtsopnchi.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuchi.addRow(colums);
+                            }
+                            txtsopnchi.setText(null);
+                            int tongchi = 0;
+                            int b = tableModelphieuchi.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
+                            }
+                            lbtongchi.setText(String.valueOf(tongchi));
+                            return;
                         }
-                        txtsopnchi.setText(null);
-                        int tongchi = 0;
-                        int b = tableModelphieuchi.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
-                        }
-                        lbtongchi.setText(String.valueOf(tongchi));
-                        return;
                     }
+                    JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập này!!!");
+                    txtsopnchi.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập này!!!");
-                txtsopnchi.setText(null);
             } else if (rbmaspchi.isSelected()) {
                 int sohang2 = tableModelphieuchi.getRowCount() - 1;
                 for (int i = sohang2; i >= 0; i--) {
                     tableModelphieuchi.removeRow(i);
                 }
-                String sqlktra = "select* from chitietphieunhap";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    if (txtmaspchi.getText().equals(rsktra.getString(2))) {
-                        String sqlsopx = "select* from chitietphieunhap where MaSP='" + txtmaspchi.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuchi.addRow(colums);
+                if (txtmaspchi.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "Không được để trống ô mã sản phẩm của bảng phiếu chi!!!");
+                    return;
+                } else {
+                    String sqlktra = "select* from chitietphieunhap";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        if (txtmaspchi.getText().equals(rsktra.getString(2))) {
+                            String sqlsopx = "select* from chitietphieunhap where MaSP='" + txtmaspchi.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuchi.addRow(colums);
+                            }
+                            txtmaspchi.setText(null);
+                            int tongchi = 0;
+                            int b = tableModelphieuchi.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
+                            }
+                            lbtongchi.setText(String.valueOf(tongchi));
+                            return;
                         }
-                        txtmaspchi.setText(null);
-                        int tongchi = 0;
-                        int b = tableModelphieuchi.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
-                        }
-                        lbtongchi.setText(String.valueOf(tongchi));
-                        return;
                     }
+                    JOptionPane.showMessageDialog(rootPane, "không có sản phẩm này!!!");
+                    txtmaspchi.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có sản phẩm này!!!");
-                txtmaspchi.setText(null);
             } else if (rbngaynhapchi.isSelected()) {
                 int sohang3 = tableModelphieuchi.getRowCount() - 1;
                 for (int i = sohang3; i >= 0; i--) {
                     tableModelphieuchi.removeRow(i);
                 }
-                Date tungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungaynhapchi.getText());
-                Date denngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngaynhapchi.getText());
+                if (txttungaynhapchi.getText().equals("") || txtdenngaynhapchi.getText().equals("")) {
+                    JOptionPane.showMessageDialog(rootPane, "Không được để trống ô từ ngày và đến ngày trong bảng phiếu chi!!!");
+                    return;
+                } else {
+                    Date tungay = new SimpleDateFormat("yyyy-MM-dd").parse(txttungaynhapchi.getText());
+                    Date denngay = new SimpleDateFormat("yyyy-MM-dd").parse(txtdenngaynhapchi.getText());
 
-                String sqlktra = "select* from chitietphieunhap";
-                ResultSet rsktra = stmt.executeQuery(sqlktra);
-                while (rsktra.next()) {
-                    Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(8));
-                    if (date1.compareTo(tungay) >= 0 && date1.compareTo(denngay) <= 0) {
-                        String sqlsopx = "select* from chitietphieunhap where NgayNhap between'" + txttungaynhapchi.getText() + "'and'" + txtdenngaynhapchi.getText() + "'";
-                        ResultSet rssopx = stmt.executeQuery(sqlsopx);
-                        while (rssopx.next()) {
-                            String[] colums = new String[8];
-                            colums[0] = rssopx.getString(1);
-                            colums[1] = rssopx.getString(2);
-                            colums[2] = rssopx.getString(3);
-                            colums[3] = rssopx.getString(4);
-                            colums[4] = rssopx.getString(5);
-                            colums[5] = rssopx.getString(6);
-                            colums[6] = rssopx.getString(7);
-                            colums[7] = rssopx.getString(8);
-                            tableModelphieuchi.addRow(colums);
+                    String sqlktra = "select* from chitietphieunhap";
+                    ResultSet rsktra = stmt.executeQuery(sqlktra);
+                    while (rsktra.next()) {
+                        Date date1 = new SimpleDateFormat("yyyy-MM-dd").parse(rsktra.getString(8));
+                        if (date1.compareTo(tungay) >= 0 && date1.compareTo(denngay) <= 0) {
+                            String sqlsopx = "select* from chitietphieunhap where NgayNhap between'" + txttungaynhapchi.getText() + "'and'" + txtdenngaynhapchi.getText() + "'";
+                            ResultSet rssopx = stmt.executeQuery(sqlsopx);
+                            while (rssopx.next()) {
+                                String[] colums = new String[8];
+                                colums[0] = rssopx.getString(1);
+                                colums[1] = rssopx.getString(2);
+                                colums[2] = rssopx.getString(3);
+                                colums[3] = rssopx.getString(4);
+                                colums[4] = rssopx.getString(5);
+                                colums[5] = rssopx.getString(6);
+                                colums[6] = rssopx.getString(7);
+                                colums[7] = rssopx.getString(8);
+                                tableModelphieuchi.addRow(colums);
+                            }
+                            txttungaynhapchi.setText(null);
+                            txtdenngaynhapchi.setText(null);
+                            int tongchi = 0;
+                            int b = tableModelphieuchi.getRowCount() - 1;
+                            for (int i = b; i >= 0; i--) {
+                                tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
+                            }
+                            lbtongchi.setText(String.valueOf(tongchi));
+                            return;
                         }
-                        txttungaynhapchi.setText(null);
-                        txtdenngaynhapchi.setText(null);
-                        int tongchi = 0;
-                        int b = tableModelphieuchi.getRowCount() - 1;
-                        for (int i = b; i >= 0; i--) {
-                            tongchi = tongchi + Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 5))) * Integer.parseInt(String.valueOf(tableModelphieuchi.getValueAt(i, 6)));
-                        }
-                        lbtongchi.setText(String.valueOf(tongchi));
-                        return;
                     }
+                    JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập nào trong khoảng ngày này!!!");
+                    txttungaynhapchi.setText(null);
+                    txtdenngaynhapchi.setText(null);
                 }
-                JOptionPane.showMessageDialog(rootPane, "không có phiếu nhập nào trong khoảng ngày này!!!");
-                txttungaynhapchi.setText(null);
-                txtdenngaynhapchi.setText(null);
             }
 
         } catch (ClassNotFoundException ex) {
@@ -3425,6 +3450,41 @@ public class GiaoDienChinh extends javax.swing.JFrame {
 
         txtMaSP_HangTon.setText(maSP);
     }//GEN-LAST:event_jtbHangTonMouseClicked
+
+    public static void inHoaDon(String maHD) {
+        Connection con = null;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/nhom17",
+                    "root", "123456");
+        } catch (ClassNotFoundException | SQLException ex) {
+            //JOptionPane.showMessageDialog(rootPane, "Kết nối in hóa đơn lỗi !!!");
+        }
+        try {
+            JasperReport report = JasperCompileManager.compileReport("C:/Users/ad/Desktop/btl/btljava_nhom17/src/nhom17_btl_java/inhoadon.jrxml");
+
+            Hashtable map = new Hashtable();
+            map.put("mahd", maHD);
+            JasperPrint p = JasperFillManager.fillReport(report, map, con);
+            JasperViewer.viewReport(p, false);
+        } catch (JRException ex) {
+            Logger.getLogger(Run.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+
+    private void btninhdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btninhdActionPerformed
+
+        String mahd = txtmahd.getText();
+
+        System.out.println(mahd);
+        if (txtmahd.getText().equals("")) {
+            JOptionPane.showMessageDialog(rootPane, "bạn cần phải nhập mã hóa đươn để in!!!");
+            return;
+        }
+        inHoaDon(mahd);
+
+    }//GEN-LAST:event_btninhdActionPerformed
 
     /**
      * @param args the command line arguments
