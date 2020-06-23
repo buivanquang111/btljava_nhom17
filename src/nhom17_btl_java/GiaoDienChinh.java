@@ -3461,7 +3461,7 @@ public class GiaoDienChinh extends javax.swing.JFrame {
             //JOptionPane.showMessageDialog(rootPane, "Kết nối in hóa đơn lỗi !!!");
         }
         try {
-            JasperReport report = JasperCompileManager.compileReport("C:/Users/ad/Desktop/btl/btljava_nhom17/src/nhom17_btl_java/inhoadon.jrxml");
+            JasperReport report = JasperCompileManager.compileReport("src/nhom17_btl_java/inhoadon.jrxml");
 
             Hashtable map = new Hashtable();
             map.put("mahd", maHD);
