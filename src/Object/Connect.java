@@ -20,7 +20,7 @@ import java.sql.*;
  */
 public class Connect {
     public Connection conn;
-    public String DB_NAME = "jdbc:mysql://localhost:3306/nhom17";
+    public String DB_NAME = "jdbc:mysql://localhost:3306/testnhom17";
     public String DB_USERNAME = "root";
     public String DB_PASSWORD = "123456";
 
@@ -166,7 +166,7 @@ public class Connect {
     public ArrayList<doanhthu> laydanhsach1(){
         ArrayList<doanhthu> danhsach = new ArrayList<>();
         
-        String sql = "SELECT MaSP, TenSP, SoLuong, DonGia, TenKH, GhiChu, hoadon.MaHD FROM hoadon INNER JOIN chitiethd ON chitiethd.MaHD = hoadon.MaHD";
+        String sql = "SELECT MaSP, TenSP, SoLuong, DonGia, TenKH, GhiChu, hoadon.MaHD, hoadon.NgayLap FROM hoadon INNER JOIN chitiethd ON chitiethd.MaHD = hoadon.MaHD";
         
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -182,6 +182,7 @@ public class Connect {
                 dt.setTenKH(rs.getString("TenKH"));
                 dt.setGhiChu(rs.getString("GhiChu"));
                 dt.setMaHD(rs.getString("MaHD"));
+                dt.setNgay(rs.getString("NgayLap"));
                 
                 danhsach.add(dt);
                              
@@ -226,16 +227,62 @@ public class Connect {
     public int tongDoanhThu(){
         Integer tongDT = new Integer(0);
        
-        String sql = "SELECT sum(DonGia) FROM chitiethd";
+        String sql = "SELECT sum(DonGia*SoLuong) FROM chitiethd";
         try {
             PreparedStatement ps = conn.prepareStatement(sql);
             ResultSet rs = ps.executeQuery();
             rs.next();
-            tongDT = rs.getInt("sum(DonGia)");
+            tongDT = rs.getInt("sum(DonGia*SoLuong)");
          
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return tongDT;
+    }
+    
+    public ArrayList<doanhthu> laydanhsach2(String tu, String den){
+        ArrayList<doanhthu> danhsach = new ArrayList<>();
+        
+        String sql = "SELECT MaSP, TenSP, SoLuong, DonGia, TenKH, GhiChu, hoadon.MaHD, hoadon.NgayLap FROM hoadon INNER JOIN chitiethd ON chitiethd.MaHD = hoadon.MaHD WHERE NgayLap BETWEEN '" + tu + "' AND '" + den+"'";
+        
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            
+            while(rs.next()) {
+                doanhthu dt = new doanhthu();
+                
+                dt.setMaSP(rs.getString("MaSP"));
+                dt.setTenSP(rs.getString("TenSP"));
+                dt.setSoLuong(rs.getInt("SoLuong"));
+                dt.setDonGia(rs.getInt("DonGia"));
+                dt.setTenKH(rs.getString("TenKH"));
+                dt.setGhiChu(rs.getString("GhiChu"));
+                dt.setMaHD(rs.getString("MaHD"));
+                dt.setNgay(rs.getString("NgayLap"));
+                
+                danhsach.add(dt);
+                             
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return danhsach;
+    }
+    
+    public int tongNhap(){
+        Integer tongN = new Integer(0);
+       
+        String sql = "SELECT sum(DonGiaN*SoLuongN) FROM chitietphieunhap";
+        try {
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            tongN = rs.getInt("sum(DonGiaN*SoLuongN)");
+         
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return tongN;
     }
 }

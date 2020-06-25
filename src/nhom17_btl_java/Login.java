@@ -24,7 +24,7 @@ public class Login extends javax.swing.JFrame {
      * Creates new form Login
      */
     static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-    static final String DB_URL = "jdbc:mysql://localhost:3306/nhom17";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/testnhom17";
     static final String USER = "root";
     static final String PASS = "123456";
 
@@ -182,7 +182,7 @@ public class Login extends javax.swing.JFrame {
             con = DriverManager.getConnection(DB_URL, USER, PASS);
             stmt = con.createStatement();
             if (txtusername.getText().equals("") || txtpassword.getText().equals("")) {
-                JOptionPane.showMessageDialog(rootPane, "bạn không được để trống usernawm hoặc password!!!!");
+                JOptionPane.showMessageDialog(rootPane, "bạn không được để trống username hoặc password!!!!");
             } else {
                 String user = "select * from nhanvien";
                 ResultSet rs = stmt.executeQuery(user);

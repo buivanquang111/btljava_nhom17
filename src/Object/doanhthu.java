@@ -18,11 +18,13 @@ public class doanhthu {
     private String GhiChu;
     private String MaHD;
     private int tongHD;
+    private String Ngay;
+    private int tongNhap;
 
     public doanhthu() {
     }
 
-    public doanhthu(String MaSP, String TenSP, int SoLuong, int DonGia, String TenKH, String GhiChu, String MaHD) {
+    public doanhthu(String MaSP, String TenSP, int SoLuong, int DonGia, String TenKH, String GhiChu, String MaHD, int tongHD, String Ngay, int tongNhap) {
         this.MaSP = MaSP;
         this.TenSP = TenSP;
         this.SoLuong = SoLuong;
@@ -30,6 +32,9 @@ public class doanhthu {
         this.TenKH = TenKH;
         this.GhiChu = GhiChu;
         this.MaHD = MaHD;
+        this.tongHD = tongHD;
+        this.Ngay = Ngay;
+        this.tongNhap = tongNhap;
     }
 
     public String getMaSP() {
@@ -88,7 +93,30 @@ public class doanhthu {
         this.MaHD = MaHD;
     }
 
-    public int gettongHD() {
+    public int getTongHD() {
         return tongHD;
     }
+
+    public void setTongHD(int tongHD) {
+        this.tongHD = tongHD;
+    }
+
+    public String getNgay() {
+        return Ngay;
+    }
+
+    public void setNgay(String Ngay) {
+        this.Ngay = Ngay;
+    }
+
+    public int getTongNhap() {
+        return tongNhap;
+    }
+
+    public void setTongNhap(int tongNhap) {
+        this.tongNhap = tongNhap;
+    }
+
+    
+    
 }

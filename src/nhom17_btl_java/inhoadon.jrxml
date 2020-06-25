@@ -88,8 +88,8 @@ where hoadon.`MaHD`=$P{mahd}]]>
 				<text><![CDATA[Cửa Hàng Rượu Vang Đà Lạt]]></text>
 			</staticText>
 			<image>
-				<reportElement x="11" y="0" width="90" height="92" uuid="7426185b-0bd7-4f71-bb1b-d30af7d005a0"/>
-				<imageExpression><![CDATA["C:\\Users\\ad\\Desktop\\btl\\btljava_nhom17\\src\\image\\anhruouvang.jpg"]]></imageExpression>
+				<reportElement x="11" y="13" width="79" height="84" uuid="c55a3389-773b-47e6-8030-07767065710f"/>
+				<imageExpression><![CDATA["C:\\Users\\ad\\Desktop\\JAVA_NHOM17_CNTT3_K12_quanlybanhangruouvangdalat\\JAVA_NHOM17_CNTT3_K12_quanlybanhangruouvangdalat\\src\\image\\anhruouvang.jpg"]]></imageExpression>
 			</image>
 		</band>
 	</title>
